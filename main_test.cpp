@@ -3,6 +3,7 @@
 //
 
 #include <gtest/gtest.h>
+#include "matrix.h"
 
 int main(int argc, char* argv[])
 {
@@ -14,7 +15,7 @@ using namespace std;
 
 TEST(MatrixBasicTesting, MatrixBasicCreationAndDestructionAndStreaming)
 {
-    Matrix<int>* m =  new Matrix<int>(2,2);
+    IMatrix<int>* m =  new Matrix<int>(2,2);
     m->SetItemAt(0, 0 ,1);
     m->SetItemAt(0, 1, 0);
     m->SetItemAt(1, 0, 0);
@@ -28,7 +29,7 @@ TEST(MatrixBasicTesting, MatrixBasicCreationAndDestructionAndStreaming)
 
 TEST(MatrixBasicTesting, MatrixBasicScalarOperations)
 {
-    Matrix<int>* m =  new Matrix<int>(2,2);
+    IMatrix<int>* m =  new Matrix<int>(2,2);
     m->SetItemAt(0, 0 ,1);
     m->SetItemAt(0, 1, 0);
     m->SetItemAt(1, 0, 0);
@@ -51,13 +52,13 @@ TEST(MatrixBasicTesting, MatrixBasicScalarOperations)
 
 TEST(MatrixBasicTesting, MatrixBasicMatrixOperations)
 {
-    Matrix<int>* m =  new Matrix<int>(2,2);
+    IMatrix<int>* m =  new Matrix<int>(2,2);
     m->SetItemAt(0, 0 ,1);
     m->SetItemAt(0, 1, 0);
     m->SetItemAt(1, 0, 0);
     m->SetItemAt(1, 1, 1);
 
-    Matrix<int>* m2 =  new Matrix<int>(2,2);
+    IMatrix<int>* m2 =  new Matrix<int>(2,2);
     m->SetItemAt(0, 0 ,0);
     m->SetItemAt(0, 1, 1);
     m->SetItemAt(1, 0, 1);
@@ -70,14 +71,14 @@ TEST(MatrixBasicTesting, MatrixBasicMatrixOperations)
     string repr = "[[2, 2], [2, 2]]";
     ASSERT_EQ(ss.str(), repr);
 
-    *m -= *m2;
+    *m += (*m2)*-1;
     *m *= *m2;
     ASSERT_TRUE(*m == *m2);
 }
 
-TEST(MatrixBasicTesting, MatrixBasicMatrixOperations)
+TEST(MatrixBasicTesting, MatrixTranspose)
 {
-    Matrix<int>* m =  new Matrix<int>(2, 3);
+    IMatrix<int>* m =  new Matrix<int>(2, 3);
     m->SetItemAt(0, 0 ,1);
     m->SetItemAt(0, 1, 0);
     m->SetItemAt(0, 2, 1);
@@ -99,7 +100,7 @@ TEST(MatrixBasicTesting, MatrixBasicMatrixOperations)
 
 TEST(MatrixAdvancedTesting, MatrixAdvancedCaluclation)
 {
-    Matrix<int>* m =  new Matrix<int>(4,4);
+    IMatrix<int>* m =  new Matrix<int>(4,4);
     m->SetItemAt(0, 0 ,1);
     m->SetItemAt(0, 1, 0);
     m->SetItemAt(1, 0, 0);

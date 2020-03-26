@@ -10,9 +10,16 @@
 #include "matrix_interface.h"
 
 template <typename T>
-class Matrix: MatrixInterface<T, Matrix<T> >
+class Matrix;
+
+template <typename T>
+using IMatrix = MatrixInterface<T, Matrix<T> >;
+
+template <typename T>
+class Matrix: public MatrixInterface<T, Matrix<T> >
 {
 public:
+
     Matrix(size_t rows, size_t columns);
     Matrix(const Matrix& toCopy);
     Matrix& operator=(const Matrix& toCopy);
