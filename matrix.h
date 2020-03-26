@@ -6,86 +6,131 @@
 #define SPARSEMATRIX_MATRIX_H
 
 #include <cstddef>
-#include "point.h"
+#include <string>
+#include "matrix_interface.h"
 
-template<typename T, typename U>
-class Matrix
+template <typename T>
+class Matrix: MatrixInterface<T, Matrix<T> >
 {
-    template<typename V, typename K>
-    friend std::ostream& operator<<(std::ostream& os, const Matrix<V, K>& mat);
-
-    template<typename V, typename K>
-    friend bool operator==(const Matrix<T, U>& mat1, const Matrix<V, K>& mat2);
-
-    template<typename V, typename K>
-    friend U operator+(const Matrix<T, U>& mat1, const Matrix<V, K>& mat2);
-
-    template<typename V, typename K>
-    friend U operator*(const Matrix<T, U>& mat1, const Matrix<V, K>& mat2);
-
-    template<typename V, typename K>
-    friend U operator+(const Matrix<T, U>& mat, const V& val);
-
-    template<typename V, typename K>
-    friend U operator*(const Matrix<T, U>& mat, const V& val);
-
 public:
-    virtual T itemAt(size_t row, size_t col) = 0;
-    virtual void SetItemAt(size_t row, size_t col, T value) = 0;
+    Matrix(size_t rows, size_t columns);
+    Matrix(const Matrix& toCopy);
+    Matrix& operator=(const Matrix& toCopy);
+    virtual ~Matrix();
 
-    virtual Matrix<T, U>& operator+=(const T& val) = 0;
-    virtual Matrix<T, U>& operator*=(const T& val) = 0;
+    virtual T itemAt(size_t row, size_t col);
+    virtual void SetItemAt(size_t row, size_t col, T value);
 
-    virtual Matrix<T, U>& operator+=(const Matrix<T, U>& val) = 0;
-    virtual Matrix<T, U>& operator*=(const Matrix<T, U>& val) = 0;
-
-    virtual T& operator[](const Point&) = 0;
+    virtual MatrixInterface<T, Matrix<T> > &operator+=(const T &val);
+    virtual MatrixInterface<T, Matrix<T> > &operator*=(const T &val);
+    virtual MatrixInterface<T, Matrix<T> > &operator+=(const MatrixInterface<T, Matrix<T> > &val);
+    virtual MatrixInterface<T, Matrix<T> > &operator*=(const MatrixInterface<T, Matrix<T> > &val);
+    virtual T &operator[](const Point &point);
 
 protected:
-    virtual U add(const T& val) const = 0;
-    virtual U add(const Matrix<T, U>& mat) const = 0;
-    virtual U mul(const T& val) const = 0;
-    virtual U mul(const Matrix<T, U>& mat) const = 0;
-    virtual Matrix<T, U>& Transpose() const = 0;
-    virtual std::string representMat() const = 0;
-    virtual bool equals(const Matrix<T, U>& mat) const = 0;
+    virtual Matrix<T> add(const T &val) const;
+    virtual Matrix<T> add(const MatrixInterface<T, Matrix<T> > &mat) const;
+    virtual Matrix<T> mul(const T &val) const;
+    virtual Matrix<T> mul(const MatrixInterface<T, Matrix<T> > &mat) const;
+    virtual MatrixInterface<T, Matrix<T> > &Transpose() const;
+    virtual std::string representMat() const;
+    virtual bool equals(const MatrixInterface<T, Matrix<T> > &mat) const;
+
+private:
+    size_t m_rows;
+    size_t m_columns;
+    T* m_mat;
 };
 
-template<typename V, typename K>
-K operator*(const Matrix<V, K>& mat, const V & val)
-{
-    return mat.mul(val);
+
+template<typename T>
+Matrix<T>::Matrix(size_t rows, size_t columns) {
+
 }
 
-template<typename V, typename K>
-K operator+(const Matrix<V, K>& mat, const V & val)
-{
-    return mat.add(val);
+template<typename T>
+Matrix<T>::Matrix(const Matrix &toCopy) {
+
 }
 
-template<typename V, typename K>
-K operator*(const Matrix<V, K>& mat1, const Matrix<V, K>& mat2)
-{
-    return mat1.mul(mat2);
+template<typename T>
+Matrix<T> &Matrix<T>::operator=(const Matrix &toCopy) {
+    return <#initializer#>;
 }
 
-template<typename V, typename K>
-K operator+(const Matrix<V, K>& mat1, const Matrix<V, K>& mat2)
-{
-    return mat1.add(mat2);
+template<typename T>
+Matrix<T>::~Matrix() {
+
 }
 
-template<typename V, typename K>
-bool operator==(const Matrix<V, K>& mat1, const Matrix<V, K>& mat2)
-{
-    return mat1.equals(mat2);
+template<typename T>
+T Matrix<T>::itemAt(size_t row, size_t col) {
+    return NULL;
 }
 
-template<typename V, typename K>
-std::ostream &operator<<(std::ostream &os, const Matrix<V, K>& mat)
-{
-    os << mat.representMat();
-    return os;
+template<typename T>
+void Matrix<T>::SetItemAt(size_t row, size_t col, T value) {
+
+}
+
+template<typename T>
+MatrixInterface<T, Matrix<T> > &Matrix<T>::operator+=(const T &val) {
+    return <#initializer#>;
+}
+
+template<typename T>
+MatrixInterface<T, Matrix<T> > &Matrix<T>::operator*=(const T &val) {
+    return <#initializer#>;
+}
+
+template<typename T>
+MatrixInterface<T, Matrix<T> > &Matrix<T>::operator+=(const MatrixInterface<T, Matrix<T> > &val) {
+    return <#initializer#>;
+}
+
+template<typename T>
+MatrixInterface<T, Matrix<T> > &Matrix<T>::operator*=(const MatrixInterface<T, Matrix<T> > &val) {
+    return <#initializer#>;
+}
+
+template<typename T>
+T &Matrix<T>::operator[](const Point &point) {
+    return <#initializer#>;
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::add(const T &val) const {
+    return Matrix<T>();
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::add(const MatrixInterface<T, Matrix<T> > &mat) const {
+    return Matrix<T>();
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::mul(const T &val) const {
+    return Matrix<T>();
+}
+
+template<typename T>
+Matrix<T> Matrix<T>::mul(const MatrixInterface<T, Matrix<T> > &mat) const {
+    return Matrix<T>();
+}
+
+template<typename T>
+MatrixInterface<T, Matrix<T> > &Matrix<T>::Transpose() const {
+    return <#initializer#>;
+}
+
+template<typename T>
+std::string Matrix<T>::representMat() const {
+    return NULL;
+}
+
+template<typename T>
+bool Matrix<T>::equals(const MatrixInterface<T, Matrix<T> > &mat) const {
+    return false;
 }
 
 #endif //SPARSEMATRIX_MATRIX_H
