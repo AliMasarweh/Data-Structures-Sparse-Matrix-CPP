@@ -15,7 +15,7 @@ using namespace std;
 
 TEST(MatrixBasicTesting, MatrixBasicCreationAndDestructionAndStreaming)
 {
-    IMatrix<int>* m =  new Matrix<int>(2,2);
+    IMatrix<int>::type* m =  new Matrix<int>(2,2);
     m->SetItemAt(0, 0 ,1);
     m->SetItemAt(0, 1, 0);
     m->SetItemAt(1, 0, 0);
@@ -29,7 +29,7 @@ TEST(MatrixBasicTesting, MatrixBasicCreationAndDestructionAndStreaming)
 
 TEST(MatrixBasicTesting, MatrixBasicScalarOperations)
 {
-    IMatrix<int>* m =  new Matrix<int>(2,2);
+    IMatrix<int>::type* m =  new Matrix<int>(2,2);
     m->SetItemAt(0, 0 ,1);
     m->SetItemAt(0, 1, 0);
     m->SetItemAt(1, 0, 0);
@@ -52,13 +52,13 @@ TEST(MatrixBasicTesting, MatrixBasicScalarOperations)
 
 TEST(MatrixBasicTesting, MatrixBasicMatrixOperations)
 {
-    IMatrix<int>* m =  new Matrix<int>(2,2);
+    IMatrix<int>::type* m =  new Matrix<int>(2,2);
     m->SetItemAt(0, 0 ,1);
     m->SetItemAt(0, 1, 0);
     m->SetItemAt(1, 0, 0);
     m->SetItemAt(1, 1, 1);
 
-    IMatrix<int>* m2 =  new Matrix<int>(2,2);
+    IMatrix<int>::type* m2 =  new Matrix<int>(2,2);
     m->SetItemAt(0, 0 ,0);
     m->SetItemAt(0, 1, 1);
     m->SetItemAt(1, 0, 1);
@@ -78,7 +78,7 @@ TEST(MatrixBasicTesting, MatrixBasicMatrixOperations)
 
 TEST(MatrixBasicTesting, MatrixTranspose)
 {
-    IMatrix<int>* m =  new Matrix<int>(2, 3);
+    IMatrix<int>::type* m =  new Matrix<int>(2, 3);
     m->SetItemAt(0, 0 ,1);
     m->SetItemAt(0, 1, 0);
     m->SetItemAt(0, 2, 1);
@@ -100,7 +100,7 @@ TEST(MatrixBasicTesting, MatrixTranspose)
 
 TEST(MatrixAdvancedTesting, MatrixAdvancedCaluclation)
 {
-    IMatrix<int>* m =  new Matrix<int>(4,4);
+    IMatrix<int>::type* m =  new Matrix<int>(4,4);
     m->SetItemAt(0, 0 ,1);
     m->SetItemAt(0, 1, 0);
     m->SetItemAt(1, 0, 0);

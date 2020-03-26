@@ -13,10 +13,14 @@ template <typename T>
 class Matrix;
 
 template <typename T>
-using IMatrix = MatrixInterface<T, Matrix<T> >;
+class IMatrix
+{
+public:
+    typedef MatrixInterface<T, Matrix<T> > type;
+};
 
 template <typename T>
-class Matrix: public IMatrix<T>
+class Matrix: public MatrixInterface<T, Matrix<T> >
 {
 public:
 
@@ -28,20 +32,20 @@ public:
     virtual T itemAt(size_t row, size_t col);
     virtual void SetItemAt(size_t row, size_t col, T value);
 
-    virtual IMatrix<T> &operator+=(T val);
-    virtual IMatrix<T> &operator*=(T val);
-    virtual IMatrix<T> &operator+=(const IMatrix<T> &val);
-    virtual IMatrix<T> &operator*=(const IMatrix<T> &val);
+    virtual MatrixInterface<T, Matrix<T> > &operator+=(T val);
+    virtual MatrixInterface<T, Matrix<T> > &operator*=(T val);
+    virtual MatrixInterface<T, Matrix<T> > &operator+=(const MatrixInterface<T, Matrix<T> > &val);
+    virtual MatrixInterface<T, Matrix<T> > &operator*=(const MatrixInterface<T, Matrix<T> > &val);
     virtual T &operator[](const Point &point);
 
 protected:
     virtual Matrix<T> add(T val) const;
-    virtual Matrix<T> add(const IMatrix<T> &mat) const;
+    virtual Matrix<T> add(const MatrixInterface<T, Matrix<T> > &mat) const;
     virtual Matrix<T> mul(T val) const;
-    virtual Matrix<T> mul(const IMatrix<T> &mat) const;
-    virtual IMatrix<T> &Transpose() const;
+    virtual Matrix<T> mul(const MatrixInterface<T, Matrix<T> > &mat) const;
+    virtual MatrixInterface<T, Matrix<T> > &Transpose() const;
     virtual std::string representMat() const;
-    virtual bool equals(const IMatrix<T> &mat) const;
+    virtual bool equals(const MatrixInterface<T, Matrix<T> > &mat) const;
 
 private:
     size_t m_rows;
@@ -128,7 +132,7 @@ void Matrix<T>::SetItemAt(size_t row, size_t col, T value)
 }
 
 template<typename T>
-IMatrix<T> &Matrix<T>::operator+=(T val)
+MatrixInterface<T, Matrix<T> > &Matrix<T>::operator+=(T val)
 {
     Matrix<T> tmp = *this + val;
     *this = tmp;
@@ -136,7 +140,7 @@ IMatrix<T> &Matrix<T>::operator+=(T val)
 }
 
 template<typename T>
-IMatrix<T> &Matrix<T>::operator*=(T val)
+MatrixInterface<T, Matrix<T> > &Matrix<T>::operator*=(T val)
 {
     Matrix<T> tmp = *this * val;
     *this = tmp;
@@ -144,7 +148,7 @@ IMatrix<T> &Matrix<T>::operator*=(T val)
 }
 
 template<typename T>
-IMatrix<T> &Matrix<T>::operator+=(const IMatrix<T> & mat)
+MatrixInterface<T, Matrix<T> > &Matrix<T>::operator+=(const MatrixInterface<T, Matrix<T> > & mat)
 {
     Matrix<T> tmp = *this + mat;
     *this = tmp;
@@ -152,7 +156,7 @@ IMatrix<T> &Matrix<T>::operator+=(const IMatrix<T> & mat)
 }
 
 template<typename T>
-IMatrix<T> &Matrix<T>::operator*=(const IMatrix<T> & mat)
+MatrixInterface<T, Matrix<T> > &Matrix<T>::operator*=(const MatrixInterface<T, Matrix<T> > & mat)
 {
     Matrix<T> tmp = *this * mat;
     *this = tmp;
@@ -186,7 +190,7 @@ Matrix<T> Matrix<T>::add(T val) const
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::add(const IMatrix<T> &mat) const
+Matrix<T> Matrix<T>::add(const MatrixInterface<T, Matrix<T> > &mat) const
 {
     Matrix<T> tmp(*this);
     for (int i = 0; i < m_rows; ++i)
@@ -216,13 +220,13 @@ Matrix<T> Matrix<T>::mul(T val) const
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::mul(const IMatrix<T> &mat) const
+Matrix<T> Matrix<T>::mul(const MatrixInterface<T, Matrix<T> > &mat) const
 {
     return Matrix<T>();
 }
 
 template<typename T>
-IMatrix<T> &Matrix<T>::Transpose() const
+MatrixInterface<T, Matrix<T> > &Matrix<T>::Transpose() const
 {
     size_t tmp = m_rows;
     m_rows = m_columns;
@@ -238,7 +242,7 @@ std::string Matrix<T>::representMat() const
 }
 
 template<typename T>
-bool Matrix<T>::equals(const IMatrix<T> &mat) const
+bool Matrix<T>::equals(const MatrixInterface<T, Matrix<T> > &mat) const
 {
     Matrix<T>& tmpRef = *this;
     for (int i = 0; i < m_rows; ++i)
