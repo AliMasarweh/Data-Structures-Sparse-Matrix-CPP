@@ -24,10 +24,10 @@ class MatrixInterface
     friend K operator*(const MatrixInterface<V, K>& mat1, const MatrixInterface<V, K>& mat2);
 
     template<typename V, typename K>
-    friend K operator+(const MatrixInterface<V, K>& mat, const V& val);
+    friend K operator+(const MatrixInterface<V, K>& mat, V val);
 
     template<typename V, typename K>
-    friend K operator*(const MatrixInterface<V, K>& mat, const V& val);
+    friend K operator*(const MatrixInterface<V, K>& mat, V val);
 
 public:
     virtual ~MatrixInterface<T, U>() {};
@@ -35,8 +35,8 @@ public:
     virtual T itemAt(size_t row, size_t col) = 0;
     virtual void SetItemAt(size_t row, size_t col, T value) = 0;
 
-    virtual MatrixInterface<T, U>& operator+=(const T& val) = 0;
-    virtual MatrixInterface<T, U>& operator*=(const T& val) = 0;
+    virtual MatrixInterface<T, U>& operator+=(T val) = 0;
+    virtual MatrixInterface<T, U>& operator*=(T val) = 0;
 
     virtual MatrixInterface<T, U>& operator+=(const MatrixInterface<T, U>& val) = 0;
     virtual MatrixInterface<T, U>& operator*=(const MatrixInterface<T, U>& val) = 0;
@@ -45,22 +45,22 @@ public:
     virtual MatrixInterface<T, U>& Transpose() const = 0;
 
 protected:
-    virtual U add(const T& val) const = 0;
+    virtual U add(T val) const = 0;
     virtual U add(const MatrixInterface<T, U>& mat) const = 0;
-    virtual U mul(const T& val) const = 0;
+    virtual U mul(T val) const = 0;
     virtual U mul(const MatrixInterface<T, U>& mat) const = 0;
     virtual std::string representMat() const = 0;
     virtual bool equals(const MatrixInterface<T, U>& mat) const = 0;
 };
 
 template<typename V, typename K>
-K operator*(const MatrixInterface<V, K>& mat, const V & val)
+K operator*(const MatrixInterface<V, K>& mat, V val)
 {
     return mat.mul(val);
 }
 
 template<typename V, typename K>
-K operator+(const MatrixInterface<V, K>& mat, const V & val)
+K operator+(const MatrixInterface<V, K>& mat, V val)
 {
     return mat.add(val);
 }
