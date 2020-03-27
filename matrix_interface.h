@@ -52,6 +52,30 @@ protected:
     size_t m_columns;
 };
 
+class MatrixException: public std::exception
+{
+public:
+    MatrixException(std::string message);
+    const char *what() const throw();
+    ~MatrixException() throw() {}
+
+private:
+    std::string m_message;
+};
+
+class ShapeMatrixException: public MatrixException
+{
+public:
+    ShapeMatrixException(): MatrixException("Incompatible shapes!") {}
+};
+
+class IndexingMatrixException: public MatrixException
+{
+public:
+    IndexingMatrixException(): MatrixException("Out of bounds point!") {}
+};
+
+// MatrixInterface Definitions
 template<typename V, typename K>
 MatrixInterface<V, K>::MatrixInterface(size_t rows, size_t columns)
 : m_rows(rows), m_columns(columns){}
@@ -91,6 +115,14 @@ std::ostream &operator<<(std::ostream &os, const MatrixInterface<V, K>& mat)
 {
     os << mat.representMat();
     return os;
+}
+
+// MatrixException Definitions
+MatrixException::MatrixException(std::string message): m_message(message){}
+
+const char * MatrixException::what() const throw()
+{
+    return m_message.c_str();
 }
 
 #endif //SPARSEMATRIX_MATRIX_INTERFACE_H

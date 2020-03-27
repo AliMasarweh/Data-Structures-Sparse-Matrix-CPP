@@ -99,7 +99,7 @@ template<typename U>
 U operator*(const PointerArray<U> &array1, const PointerArray<U> &array2)
 {
     if(array1.m_size != array2.m_size)
-        throw -1; // shape error
+        throw ShapeMatrixException();
     U ans = 0;
     for (int i = 0; i < array1.m_size; ++i)
     {
@@ -172,7 +172,7 @@ T Matrix<T>::itemAt(size_t row, size_t col)
 {
     if(row >= this->m_rows || col > this->m_columns)
     {
-        // throw OutOfBounds
+        throw IndexingMatrixException();
     }
 
     return this->m_mat[row*this->m_columns + col];
@@ -183,7 +183,7 @@ void Matrix<T>::SetItemAt(size_t row, size_t col, T value)
 {
     if(row >= this->m_rows || col > this->m_columns)
     {
-        // throw OutOfBounds
+        throw IndexingMatrixException();
     }
 
     this->m_mat[row*this->m_columns + col] = value;
@@ -227,7 +227,7 @@ T &Matrix<T>::operator[](const Point &point)
     size_t row = point.getX(), col = point.getY();
     if(row >= this->m_rows || col > this->m_columns)
     {
-        // throw OutOfBounds
+        throw IndexingMatrixException();
     }
     return this->m_mat(row*this->m_columns + col);
 }
