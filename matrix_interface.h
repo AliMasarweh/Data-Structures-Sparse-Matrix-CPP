@@ -37,8 +37,12 @@ public:
     virtual MatrixInterface<T, U>& operator+=(const MatrixInterface<T, U>& val) = 0;
     virtual MatrixInterface<T, U>& operator*=(const MatrixInterface<T, U>& val) = 0;
 
-    virtual T& operator[](const Point&) = 0;
-    virtual MatrixInterface<T, U>& Transpose() const = 0;
+    virtual const T& operator[](const Point&) const = 0;
+    virtual T& at(const Point&) = 0;
+    virtual MatrixInterface<T, U>& Transpose() = 0;
+
+    size_t getRowsNumber() const;
+    size_t getColumnsNumber() const;
 
 protected:
     virtual U add(T val) const = 0;
@@ -115,6 +119,18 @@ std::ostream &operator<<(std::ostream &os, const MatrixInterface<V, K>& mat)
 {
     os << mat.representMat();
     return os;
+}
+
+template<typename T, typename U>
+size_t MatrixInterface<T, U>::getRowsNumber() const 
+{
+    return m_rows;
+}
+
+template<typename T, typename U>
+size_t MatrixInterface<T, U>::getColumnsNumber() const 
+{
+    return m_columns;
 }
 
 // MatrixException Definitions

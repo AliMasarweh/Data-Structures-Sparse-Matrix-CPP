@@ -40,14 +40,15 @@ public:
     virtual MatrixInterface<T, Matrix<T> > &operator*=(T val);
     virtual MatrixInterface<T, Matrix<T> > &operator+=(const MatrixInterface<T, Matrix<T> > &val);
     virtual MatrixInterface<T, Matrix<T> > &operator*=(const MatrixInterface<T, Matrix<T> > &val);
-    virtual T &operator[](const Point &point);
+    virtual const T &operator[](const Point &point) const;
+    virtual T &at(const Point &point);
 
 protected:
     virtual Matrix<T> add(T val) const;
     virtual Matrix<T> add(const MatrixInterface<T, Matrix<T> > &mat) const;
     virtual Matrix<T> mul(T val) const;
     virtual Matrix<T> mul(const MatrixInterface<T, Matrix<T> > &mat) const;
-    virtual MatrixInterface<T, Matrix<T> > &Transpose() const;
+    virtual MatrixInterface<T, Matrix<T> > &Transpose();
     virtual std::string representMat() const;
     virtual bool equals(const MatrixInterface<T, Matrix<T> > &mat) const;
 
@@ -56,62 +57,33 @@ private:
 };
 
 template <typename T>
-class PointerArray
+class ArrayPointer
 {
     friend class Matrix<T>;
     template <typename U>
-    friend U operator*(const PointerArray<U>& array1, const PointerArray<U>& array2);
+    friend U operator*(const ArrayPointer<U>& array1, const ArrayPointer<U>& array2);
+    template <typename U>
+    friend std::ostream& operator<<(std::ostream& os, ArrayPointer& arrayPointer);
 
 public:
-    PointerArray(MatrixInterface<T, Matrix<T> >& matRef, size_t row, size_t column);
+    ArrayPointer(const MatrixInterface<T, Matrix<T> >& matRef, size_t row, size_t column);
+    const T& operator[](const Point &point) const;
+    void incrementPointer(size_t size = 1) { (*m_incrementer) += 1; }
+    void decrementPointer(size_t size = 1) { *(m_incrementer) -= 1; }
+
+    size_t getRow() const { return m_row; }
+    size_t getColumn() const { return m_column; }
+    size_t getSize() const { return m_size; }
 
 private:
-    MatrixInterface<T, Matrix<T> >* m_matRef;
+    const MatrixInterface<T, Matrix<T> >* m_matRef;
     size_t m_row;
     size_t m_column;
     size_t m_size;
     size_t* m_incrementer;
 };
 
-
-template<typename T>
-PointerArray<T>::PointerArray(MatrixInterface<T, Matrix<T>> &matRef, size_t row, size_t column):m_matRef(&matRef)
-    ,m_row(row), m_column(column)
-{
-    if(m_row != -1 && m_column != -1)
-        std::cout << "Warning: one argument should be -1 when constructing PointerArray,"
-                     " assumption now on columns" << std::endl;
-    if(m_row == -1)
-    {
-        m_incrementer = &m_row;
-        m_size = matRef.m_rows;
-    }
-    else
-    {
-        m_incrementer = &m_column;
-        m_size = matRef.m_columns;
-    }
-
-    *m_incrementer = 0;
-}
-
-template<typename U>
-U operator*(const PointerArray<U> &array1, const PointerArray<U> &array2)
-{
-    if(array1.m_size != array2.m_size)
-        throw ShapeMatrixException();
-    U ans = 0;
-    for (int i = 0; i < array1.m_size; ++i)
-    {
-        ans += array1.m_matRef[Point(array1.m_row, array1.m_column)] *
-                array2.m_matRef[Point(array2.m_row, array2.m_column)];
-        *(array1.m_incrementer) += 1;
-        *(array2.m_incrementer) += 1;
-    }
-
-    return ans;
-}
-
+// Matrix Definitions
 
 template<typename T>
 Matrix<T>::Matrix(size_t rows, size_t columns): MatrixInterface<T, Matrix<T> >(rows, columns)
@@ -222,14 +194,26 @@ MatrixInterface<T, Matrix<T> > &Matrix<T>::operator*=(const MatrixInterface<T, M
 }
 
 template<typename T>
-T &Matrix<T>::operator[](const Point &point)
+const T &Matrix<T>::operator[](const Point &point) const
 {
     size_t row = point.getX(), col = point.getY();
     if(row >= this->m_rows || col > this->m_columns)
     {
         throw IndexingMatrixException();
     }
-    return this->m_mat(row*this->m_columns + col);
+    return this->m_mat[row*this->m_columns + col];
+}
+
+
+template<typename T>
+T &Matrix<T>::at(const Point &point)
+{
+    size_t row = point.getX(), col = point.getY();
+    if(row >= this->m_rows || col > this->m_columns)
+    {
+        throw IndexingMatrixException();
+    }
+    return this->m_mat[row*this->m_columns + col];
 }
 
 template<typename T>
@@ -240,7 +224,7 @@ Matrix<T> Matrix<T>::add(T val) const
     {
         for (int j = 0; j < this->m_columns; ++j)
         {
-            tmp[Point(i, j)] += val;
+            tmp.at(Point(i, j)) += val;
         }
     }
 
@@ -255,7 +239,7 @@ Matrix<T> Matrix<T>::add(const MatrixInterface<T, Matrix<T> > &mat) const
     {
         for (int j = 0; j < this->m_columns; ++j)
         {
-            tmp[Point(i, j)] += mat[Point(i, j)];
+            tmp.at(Point(i, j)) += mat[Point(i, j)];
         }
     }
 
@@ -270,7 +254,7 @@ Matrix<T> Matrix<T>::mul(T val) const
     {
         for (int j = 0; j < this->m_columns; ++j)
         {
-            tmp[Point(i, j)] *= val;
+            tmp.at(Point(i, j)) *= val;
         }
     }
 
@@ -280,18 +264,18 @@ Matrix<T> Matrix<T>::mul(T val) const
 template<typename T>
 Matrix<T> Matrix<T>::mul(const MatrixInterface<T, Matrix<T> > &mat) const
 {
-    if(this->m_columns != mat.m_rows)
+    if(this->m_columns != mat.getRowsNumber())
     {
-        // Shape error
+        throw ShapeMatrixException();
     }
 
-    Matrix<T> ans(this->m_rows, mat.m_columns);
+    Matrix<T> ans(this->m_rows, mat.getColumnsNumber());
 
     for (int i = 0; i < this->m_rows; ++i)
     {
-        for (int j = 0; j < mat.m_columns; ++j)
+        for (int j = 0; j < mat.getColumnsNumber(); ++j)
         {
-            ans[Point(i,j)] =
+            ans.at(Point(i,j)) =
                     ArrayPointer<T>(*this, i, -1) *
                     ArrayPointer<T>(mat, -1, j);
         }
@@ -301,7 +285,7 @@ Matrix<T> Matrix<T>::mul(const MatrixInterface<T, Matrix<T> > &mat) const
 }
 
 template<typename T>
-MatrixInterface<T, Matrix<T> > &Matrix<T>::Transpose() const
+MatrixInterface<T, Matrix<T> > &Matrix<T>::Transpose()
 {
     size_t tmp = this->m_rows;
     this->m_rows = this->m_columns;
@@ -314,10 +298,12 @@ template<typename T>
 std::string Matrix<T>::representMat() const
 {
     std::stringstream ss;
-    ss << "[" << this->row(0);
+    ArrayPointer<T> arrayPointer(*this, 0, -1);
+    ss << "[" << arrayPointer;
     for (int i = 1; i < this->m_rows; ++i)
     {
-        ss << ", " << this->row(i);
+        ArrayPointer<T> arrayPointer(*this, i, -1);
+        ss << ", " << arrayPointer;
     }
     ss << "]";
 
@@ -327,7 +313,7 @@ std::string Matrix<T>::representMat() const
 template<typename T>
 bool Matrix<T>::equals(const MatrixInterface<T, Matrix<T> > &mat) const
 {
-    Matrix<T>& tmpRef = *this;
+    const Matrix<T>& tmpRef = *this;
     for (int i = 0; i < this->m_rows; ++i)
     {
         for (int j = 0; j < this->m_columns; ++j)
@@ -338,6 +324,68 @@ bool Matrix<T>::equals(const MatrixInterface<T, Matrix<T> > &mat) const
     }
 
     return true;
+}
+
+
+// ArrayPointer definitions
+template<typename T>
+ArrayPointer<T>::ArrayPointer(const MatrixInterface<T, Matrix<T> > &matRef, size_t row, size_t column):m_matRef(&matRef)
+        ,m_row(row), m_column(column)
+{
+    if(m_row != -1 && m_column != -1)
+        std::cout << "Warning: one argument should be -1 when constructing ArrayPointer,"
+                     " assumption now on columns" << std::endl;
+    if(m_row == -1)
+    {
+        m_incrementer = &m_row;
+        m_size = matRef.getRowsNumber();
+    }
+    else
+    {
+        m_incrementer = &m_column;
+        m_size = matRef.getColumnsNumber();
+    }
+
+    *m_incrementer = 0;
+}
+
+template<typename T>
+const T& ArrayPointer<T>::operator[](const Point &point) const
+{
+    return (*m_matRef)[point];
+}
+
+template<typename U>
+U operator*(const ArrayPointer<U> &array1, const ArrayPointer<U> &array2)
+{
+    if(array1.m_size != array2.m_size)
+        throw ShapeMatrixException();
+    U ans = 0;
+    for (int i = 0; i < array1.m_size; ++i)
+    {
+        ans += array1[Point(array1.m_row, array1.m_column)] *
+               array2[Point(array2.m_row, array2.m_column)];
+        *(array1.m_incrementer) += 1;
+        *(array2.m_incrementer) += 1;
+    }
+
+    return ans;
+}
+
+template<typename U>
+std::ostream& operator<<(std::ostream& os, ArrayPointer<U> &arrayPointer)
+{
+    os << "[" << arrayPointer[Point(arrayPointer.getRow(), arrayPointer.getColumn())];
+    arrayPointer.incrementPointer();
+
+    for (int i = 1; i < arrayPointer.getSize(); ++i)
+    {
+        os << ", " << arrayPointer[Point(arrayPointer.getRow(), arrayPointer.getColumn())];
+        arrayPointer.incrementPointer();
+    }
+    os << "]";
+
+    return os;
 }
 
 #endif //SPARSEMATRIX_MATRIX_H
