@@ -2,55 +2,59 @@
 // Created by ali-masa on 3/26/20.
 //
 
-#ifndef SPARSEMATRIX_MATRIX_H
-#define SPARSEMATRIX_MATRIX_H
+#ifndef SPARSEMATRIX_NIAVE_MATRIX_H
+#define SPARSEMATRIX_NIAVE_MATRIX_H
 
 #include <cstddef>
 #include <string>
 #include <sstream>
 #include "matrix_interface.h"
+#include "basic_matrix.h"
 
 template <typename T>
-class Matrix;
+class NaiveMatrix;
 
 template <typename T>
 class IMatrix
 {
 public:
-    typedef MatrixInterface<T, Matrix<T> > type;
+    typedef MatrixInterface<T, BasicMatrix<T> > type;
 };
 
 template <typename T>
 class Array;
 
 template <typename T>
-class Matrix: public MatrixInterface<T, Matrix<T> >
+class NaiveMatrix: public MatrixInterface<T, BasicMatrix<T> >
 {
 public:
 
-    Matrix(size_t rows, size_t columns);
-    Matrix(const Matrix& toCopy);
-    Matrix& operator=(const Matrix& toCopy);
-    virtual ~Matrix();
+    NaiveMatrix(size_t rows, size_t columns);
+    NaiveMatrix(const BasicMatrix<T>& basicMatrix);
+    NaiveMatrix(const NaiveMatrix& toCopy);
+    NaiveMatrix& operator=(const NaiveMatrix& toCopy);
+    virtual ~NaiveMatrix();
 
     virtual T itemAt(size_t row, size_t col);
     virtual void SetItemAt(size_t row, size_t col, T value);
 
-    virtual MatrixInterface<T, Matrix<T> > &operator+=(T val);
-    virtual MatrixInterface<T, Matrix<T> > &operator*=(T val);
-    virtual MatrixInterface<T, Matrix<T> > &operator+=(const MatrixInterface<T, Matrix<T> > &val);
-    virtual MatrixInterface<T, Matrix<T> > &operator*=(const MatrixInterface<T, Matrix<T> > &val);
+    virtual MatrixInterface<T, BasicMatrix<T> > &operator+=(T val);
+    virtual MatrixInterface<T, BasicMatrix<T> > &operator*=(T val);
+    virtual MatrixInterface<T, BasicMatrix<T> > &operator+=(const MatrixInterface<T, BasicMatrix<T> > &val);
+    virtual MatrixInterface<T, BasicMatrix<T> > &operator*=(const MatrixInterface<T, BasicMatrix<T> > &val);
     virtual const T &operator[](const Point &point) const;
     virtual T &at(const Point &point);
 
+    operator BasicMatrix<T>();
+
 protected:
-    virtual Matrix<T> add(T val) const;
-    virtual Matrix<T> add(const MatrixInterface<T, Matrix<T> > &mat) const;
-    virtual Matrix<T> mul(T val) const;
-    virtual Matrix<T> mul(const MatrixInterface<T, Matrix<T> > &mat) const;
-    virtual MatrixInterface<T, Matrix<T> > &Transpose();
+    virtual BasicMatrix<T> add(T val) const;
+    virtual BasicMatrix<T> add(const MatrixInterface<T, BasicMatrix<T> > &mat) const;
+    virtual BasicMatrix<T> mul(T val) const;
+    virtual BasicMatrix<T> mul(const MatrixInterface<T, BasicMatrix<T> > &mat) const;
+    virtual MatrixInterface<T, BasicMatrix<T> > &Transpose();
     virtual std::string representMat() const;
-    virtual bool equals(const MatrixInterface<T, Matrix<T> > &mat) const;
+    virtual bool equals(const MatrixInterface<T, BasicMatrix<T> > &mat) const;
 
 private:
     T* m_mat;
@@ -59,14 +63,14 @@ private:
 template <typename T>
 class ArrayPointer
 {
-    friend class Matrix<T>;
+    friend class NaiveMatrix<T>;
     template <typename U>
     friend U operator*(const ArrayPointer<U>& array1, const ArrayPointer<U>& array2);
     template <typename U>
     friend std::ostream& operator<<(std::ostream& os, ArrayPointer& arrayPointer);
 
 public:
-    ArrayPointer(const MatrixInterface<T, Matrix<T> >& matRef, size_t row, size_t column);
+    ArrayPointer(const MatrixInterface<T, BasicMatrix<T> >& matRef, size_t row, size_t column);
     const T& operator[](const Point &point) const;
     void incrementPointer(size_t size = 1) { (*m_incrementer) += 1; }
     void decrementPointer(size_t size = 1) { *(m_incrementer) -= 1; }
@@ -76,17 +80,17 @@ public:
     size_t getSize() const { return m_size; }
 
 private:
-    const MatrixInterface<T, Matrix<T> >* m_matRef;
+    const MatrixInterface<T, BasicMatrix<T> >* m_matRef;
     size_t m_row;
     size_t m_column;
     size_t m_size;
     size_t* m_incrementer;
 };
 
-// Matrix Definitions
+// NaiveMatrix Definitions
 
 template<typename T>
-Matrix<T>::Matrix(size_t rows, size_t columns): MatrixInterface<T, Matrix<T> >(rows, columns)
+NaiveMatrix<T>::NaiveMatrix(size_t rows, size_t columns): MatrixInterface<T, BasicMatrix<T> >(rows, columns)
         , m_mat(new T[rows*columns])
 {
     size_t cap = this->m_rows * this->m_columns;
@@ -98,7 +102,7 @@ Matrix<T>::Matrix(size_t rows, size_t columns): MatrixInterface<T, Matrix<T> >(r
 }
 
 template<typename T>
-Matrix<T>::Matrix(const Matrix &toCopy): MatrixInterface<T, Matrix<T> >(toCopy.m_rows, toCopy.m_columns)
+NaiveMatrix<T>::NaiveMatrix(const NaiveMatrix &toCopy): MatrixInterface<T, BasicMatrix<T> >(toCopy.m_rows, toCopy.m_columns)
         , m_mat(new T[this->m_rows*this->m_columns])
 {
 
@@ -113,7 +117,7 @@ Matrix<T>::Matrix(const Matrix &toCopy): MatrixInterface<T, Matrix<T> >(toCopy.m
 }
 
 template<typename T>
-Matrix<T> &Matrix<T>::operator=(const Matrix &toCopy)
+NaiveMatrix<T> &NaiveMatrix<T>::operator=(const NaiveMatrix &toCopy)
 {
     if(this != &toCopy)
     {
@@ -134,13 +138,13 @@ Matrix<T> &Matrix<T>::operator=(const Matrix &toCopy)
 }
 
 template<typename T>
-Matrix<T>::~Matrix()
+NaiveMatrix<T>::~NaiveMatrix()
 {
     delete[] this->m_mat;
 }
 
 template<typename T>
-T Matrix<T>::itemAt(size_t row, size_t col)
+T NaiveMatrix<T>::itemAt(size_t row, size_t col)
 {
     if(row >= this->m_rows || col > this->m_columns)
     {
@@ -151,7 +155,7 @@ T Matrix<T>::itemAt(size_t row, size_t col)
 }
 
 template<typename T>
-void Matrix<T>::SetItemAt(size_t row, size_t col, T value)
+void NaiveMatrix<T>::SetItemAt(size_t row, size_t col, T value)
 {
     if(row >= this->m_rows || col > this->m_columns)
     {
@@ -162,39 +166,39 @@ void Matrix<T>::SetItemAt(size_t row, size_t col, T value)
 }
 
 template<typename T>
-MatrixInterface<T, Matrix<T> > &Matrix<T>::operator+=(T val)
+MatrixInterface<T, BasicMatrix<T> > &NaiveMatrix<T>::operator+=(T val)
 {
-    Matrix<T> tmp = *this + val;
+    NaiveMatrix<T> tmp = *this + val;
     *this = tmp;
     return *this;
 }
 
 template<typename T>
-MatrixInterface<T, Matrix<T> > &Matrix<T>::operator*=(T val)
+MatrixInterface<T, BasicMatrix<T> > &NaiveMatrix<T>::operator*=(T val)
 {
-    Matrix<T> tmp = *this * val;
+    NaiveMatrix<T> tmp = *this * val;
     *this = tmp;
     return *this;
 }
 
 template<typename T>
-MatrixInterface<T, Matrix<T> > &Matrix<T>::operator+=(const MatrixInterface<T, Matrix<T> > & mat)
+MatrixInterface<T, BasicMatrix<T> > &NaiveMatrix<T>::operator+=(const MatrixInterface<T, BasicMatrix<T> > & mat)
 {
-    Matrix<T> tmp = *this + mat;
+    NaiveMatrix<T> tmp = *this + mat;
     *this = tmp;
     return *this;
 }
 
 template<typename T>
-MatrixInterface<T, Matrix<T> > &Matrix<T>::operator*=(const MatrixInterface<T, Matrix<T> > & mat)
+MatrixInterface<T, BasicMatrix<T> > &NaiveMatrix<T>::operator*=(const MatrixInterface<T, BasicMatrix<T> > & mat)
 {
-    Matrix<T> tmp = *this * mat;
+    NaiveMatrix<T> tmp = *this * mat;
     *this = tmp;
     return *this;
 }
 
 template<typename T>
-const T &Matrix<T>::operator[](const Point &point) const
+const T &NaiveMatrix<T>::operator[](const Point &point) const
 {
     size_t row = point.getX(), col = point.getY();
     if(row >= this->m_rows || col > this->m_columns)
@@ -206,7 +210,7 @@ const T &Matrix<T>::operator[](const Point &point) const
 
 
 template<typename T>
-T &Matrix<T>::at(const Point &point)
+T &NaiveMatrix<T>::at(const Point &point)
 {
     size_t row = point.getX(), col = point.getY();
     if(row >= this->m_rows || col > this->m_columns)
@@ -217,9 +221,9 @@ T &Matrix<T>::at(const Point &point)
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::add(T val) const
+BasicMatrix<T> NaiveMatrix<T>::add(T val) const
 {
-    Matrix<T> tmp(*this);
+    BasicMatrix<T> tmp(BasicMatrix<T>(*this));
     for (int i = 0; i < this->m_rows; ++i)
     {
         for (int j = 0; j < this->m_columns; ++j)
@@ -232,9 +236,9 @@ Matrix<T> Matrix<T>::add(T val) const
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::add(const MatrixInterface<T, Matrix<T> > &mat) const
+BasicMatrix<T> NaiveMatrix<T>::add(const MatrixInterface<T, BasicMatrix<T> > &mat) const
 {
-    Matrix<T> tmp(*this);
+    BasicMatrix<T> tmp(BasicMatrix<T>(*this));
     for (int i = 0; i < this->m_rows; ++i)
     {
         for (int j = 0; j < this->m_columns; ++j)
@@ -247,9 +251,9 @@ Matrix<T> Matrix<T>::add(const MatrixInterface<T, Matrix<T> > &mat) const
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::mul(T val) const
+BasicMatrix<T> NaiveMatrix<T>::mul(T val) const
 {
-    Matrix<T> tmp(*this);
+    BasicMatrix<T> tmp(BasicMatrix<T>(*this));
     for (int i = 0; i < this->m_rows; ++i)
     {
         for (int j = 0; j < this->m_columns; ++j)
@@ -262,14 +266,14 @@ Matrix<T> Matrix<T>::mul(T val) const
 }
 
 template<typename T>
-Matrix<T> Matrix<T>::mul(const MatrixInterface<T, Matrix<T> > &mat) const
+BasicMatrix<T> NaiveMatrix<T>::mul(const MatrixInterface<T, BasicMatrix<T> > &mat) const
 {
     if(this->m_columns != mat.getRowsNumber())
     {
         throw ShapeMatrixException();
     }
 
-    Matrix<T> ans(this->m_rows, mat.getColumnsNumber());
+    BasicMatrix<T> ans(this->m_rows, mat.getColumnsNumber());
 
     for (int i = 0; i < this->m_rows; ++i)
     {
@@ -285,7 +289,7 @@ Matrix<T> Matrix<T>::mul(const MatrixInterface<T, Matrix<T> > &mat) const
 }
 
 template<typename T>
-MatrixInterface<T, Matrix<T> > &Matrix<T>::Transpose()
+MatrixInterface<T, BasicMatrix<T> > &NaiveMatrix<T>::Transpose()
 {
     size_t tmp = this->m_rows;
     this->m_rows = this->m_columns;
@@ -295,7 +299,7 @@ MatrixInterface<T, Matrix<T> > &Matrix<T>::Transpose()
 }
 
 template<typename T>
-std::string Matrix<T>::representMat() const
+std::string NaiveMatrix<T>::representMat() const
 {
     std::stringstream ss;
     ArrayPointer<T> arrayPointer(*this, 0, -1);
@@ -311,9 +315,9 @@ std::string Matrix<T>::representMat() const
 }
 
 template<typename T>
-bool Matrix<T>::equals(const MatrixInterface<T, Matrix<T> > &mat) const
+bool NaiveMatrix<T>::equals(const MatrixInterface<T, BasicMatrix<T> > &mat) const
 {
-    const Matrix<T>& tmpRef = *this;
+    const NaiveMatrix<T>& tmpRef = *this;
     for (int i = 0; i < this->m_rows; ++i)
     {
         for (int j = 0; j < this->m_columns; ++j)
@@ -329,7 +333,7 @@ bool Matrix<T>::equals(const MatrixInterface<T, Matrix<T> > &mat) const
 
 // ArrayPointer definitions
 template<typename T>
-ArrayPointer<T>::ArrayPointer(const MatrixInterface<T, Matrix<T> > &matRef, size_t row, size_t column):m_matRef(&matRef)
+ArrayPointer<T>::ArrayPointer(const MatrixInterface<T, BasicMatrix<T> > &matRef, size_t row, size_t column):m_matRef(&matRef)
         ,m_row(row), m_column(column)
 {
     if(m_row != -1 && m_column != -1)
@@ -388,4 +392,4 @@ std::ostream& operator<<(std::ostream& os, ArrayPointer<U> &arrayPointer)
     return os;
 }
 
-#endif //SPARSEMATRIX_MATRIX_H
+#endif //SPARSEMATRIX_NIAVE_MATRIX_H

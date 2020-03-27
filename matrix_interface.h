@@ -7,6 +7,7 @@
 
 #include <cstddef>
 #include "point.h"
+#include "basic_matrix.h"
 
 template<typename T, typename U>
 class MatrixInterface
@@ -40,6 +41,8 @@ public:
     virtual const T& operator[](const Point&) const = 0;
     virtual T& at(const Point&) = 0;
     virtual MatrixInterface<T, U>& Transpose() = 0;
+
+    virtual operator BasicMatrix<T>() = 0;
 
     size_t getRowsNumber() const;
     size_t getColumnsNumber() const;
