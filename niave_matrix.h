@@ -45,7 +45,7 @@ public:
     virtual const T &operator[](const Point &point) const;
     virtual T &at(const Point &point);
 
-    operator BasicMatrix<T>();
+    operator BasicMatrix<T>() const;
 
 protected:
     virtual BasicMatrix<T> add(T val) const;
@@ -102,6 +102,14 @@ NaiveMatrix<T>::NaiveMatrix(size_t rows, size_t columns): MatrixInterface<T, Bas
 }
 
 template<typename T>
+NaiveMatrix<T>::NaiveMatrix(const BasicMatrix<T>& basicMatrix):
+    MatrixInterface<T, BasicMatrix<T> >(basicMatrix.getRowsNumber(), basicMatrix.getColumnsNumber()),
+    m_mat(new T[this->m_rows * this->m_columns])
+{
+
+}
+
+template<typename T>
 NaiveMatrix<T>::NaiveMatrix(const NaiveMatrix &toCopy): MatrixInterface<T, BasicMatrix<T> >(toCopy.m_rows, toCopy.m_columns)
         , m_mat(new T[this->m_rows*this->m_columns])
 {
@@ -148,7 +156,7 @@ T NaiveMatrix<T>::itemAt(size_t row, size_t col)
 {
     if(row >= this->m_rows || col > this->m_columns)
     {
-        throw IndexingMatrixException();
+        throw MatrixIndexingException();
     }
 
     return this->m_mat[row*this->m_columns + col];
@@ -159,7 +167,7 @@ void NaiveMatrix<T>::SetItemAt(size_t row, size_t col, T value)
 {
     if(row >= this->m_rows || col > this->m_columns)
     {
-        throw IndexingMatrixException();
+        throw MatrixIndexingException();
     }
 
     this->m_mat[row*this->m_columns + col] = value;
@@ -203,11 +211,10 @@ const T &NaiveMatrix<T>::operator[](const Point &point) const
     size_t row = point.getX(), col = point.getY();
     if(row >= this->m_rows || col > this->m_columns)
     {
-        throw IndexingMatrixException();
+        throw MatrixIndexingException();
     }
     return this->m_mat[row*this->m_columns + col];
 }
-
 
 template<typename T>
 T &NaiveMatrix<T>::at(const Point &point)
@@ -215,9 +222,27 @@ T &NaiveMatrix<T>::at(const Point &point)
     size_t row = point.getX(), col = point.getY();
     if(row >= this->m_rows || col > this->m_columns)
     {
-        throw IndexingMatrixException();
+        throw MatrixIndexingException();
     }
     return this->m_mat[row*this->m_columns + col];
+}
+
+template<typename T>
+NaiveMatrix<T>::operator BasicMatrix<T>() const
+{
+    const NaiveMatrix<T>& thisRef = *this;
+    BasicMatrix<T> ans(thisRef.m_rows, thisRef.m_columns);
+
+    for (int i = 0; i < thisRef.m_rows; ++i)
+    {
+        for (int j = 0; j < thisRef.m_columns; ++j)
+        {
+            Point p(i, j);
+            ans.at(p) = thisRef[p];
+        }
+    }
+
+    return ans;
 }
 
 template<typename T>
@@ -270,7 +295,7 @@ BasicMatrix<T> NaiveMatrix<T>::mul(const MatrixInterface<T, BasicMatrix<T> > &ma
 {
     if(this->m_columns != mat.getRowsNumber())
     {
-        throw ShapeMatrixException();
+        throw IncompatibleShapeMatrixException();
     }
 
     BasicMatrix<T> ans(this->m_rows, mat.getColumnsNumber());
@@ -363,7 +388,7 @@ template<typename U>
 U operator*(const ArrayPointer<U> &array1, const ArrayPointer<U> &array2)
 {
     if(array1.m_size != array2.m_size)
-        throw ShapeMatrixException();
+        throw IncompatibleShapeMatrixException();
     U ans = 0;
     for (int i = 0; i < array1.m_size; ++i)
     {

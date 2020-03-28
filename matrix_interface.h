@@ -42,7 +42,7 @@ public:
     virtual T& at(const Point&) = 0;
     virtual MatrixInterface<T, U>& Transpose() = 0;
 
-    virtual operator BasicMatrix<T>() = 0;
+    virtual operator BasicMatrix<T>() const = 0;
 
     size_t getRowsNumber() const;
     size_t getColumnsNumber() const;
@@ -59,33 +59,14 @@ protected:
     size_t m_columns;
 };
 
-class MatrixException: public std::exception
-{
-public:
-    MatrixException(std::string message);
-    const char *what() const throw();
-    ~MatrixException() throw() {}
-
-private:
-    std::string m_message;
-};
-
-class ShapeMatrixException: public MatrixException
-{
-public:
-    ShapeMatrixException(): MatrixException("Incompatible shapes!") {}
-};
-
-class IndexingMatrixException: public MatrixException
-{
-public:
-    IndexingMatrixException(): MatrixException("Out of bounds point!") {}
-};
-
 // MatrixInterface Definitions
 template<typename V, typename K>
 MatrixInterface<V, K>::MatrixInterface(size_t rows, size_t columns)
-: m_rows(rows), m_columns(columns){}
+: m_rows(rows), m_columns(columns)
+{
+    if(m_rows == 0 || m_columns == 0)
+        throw ShapeMatrixException();
+}
 
 template<typename V, typename K>
 K operator*(const MatrixInterface<V, K>& mat, V val)
@@ -134,14 +115,6 @@ template<typename T, typename U>
 size_t MatrixInterface<T, U>::getColumnsNumber() const 
 {
     return m_columns;
-}
-
-// MatrixException Definitions
-MatrixException::MatrixException(std::string message): m_message(message){}
-
-const char * MatrixException::what() const throw()
-{
-    return m_message.c_str();
 }
 
 #endif //SPARSEMATRIX_MATRIX_INTERFACE_H
