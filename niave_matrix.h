@@ -106,7 +106,13 @@ NaiveMatrix<T>::NaiveMatrix(const BasicMatrix<T>& basicMatrix):
     MatrixInterface<T, BasicMatrix<T> >(basicMatrix.getRowsNumber(), basicMatrix.getColumnsNumber()),
     m_mat(new T[this->m_rows * this->m_columns])
 {
-
+    for (int i = 0; i < this->m_rows; ++i)
+    {
+        for (int j = 0; j < this->m_columns; ++j)
+        {
+            this->m_mat[i*this->m_columns + j] = basicMatrix[Point(i, j)];
+        }
+    }
 }
 
 template<typename T>
@@ -176,7 +182,7 @@ void NaiveMatrix<T>::SetItemAt(size_t row, size_t col, T value)
 template<typename T>
 MatrixInterface<T, BasicMatrix<T> > &NaiveMatrix<T>::operator+=(T val)
 {
-    NaiveMatrix<T> tmp = *this + val;
+    BasicMatrix<T> tmp = *this + val;
     *this = tmp;
     return *this;
 }

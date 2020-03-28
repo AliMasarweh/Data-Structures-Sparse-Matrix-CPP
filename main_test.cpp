@@ -27,6 +27,28 @@ TEST(MatrixBasicTesting, MatrixBasicCreationAndDestructionAndStreaming)
     ASSERT_EQ(ss.str(), repr);
 }
 
+TEST(MatrixBasicTesting, MatrixBasicScalarAddition)
+{
+    IMatrix<int>::type *m = new NaiveMatrix<int>(2, 2);
+    m->SetItemAt(0, 0, 1);
+    m->SetItemAt(0, 1, 0);
+    m->SetItemAt(1, 0, 0);
+    m->SetItemAt(1, 1, 1);
+
+    stringstream ss;
+    ss << *m;
+    string repr = "[[1, 0], [0, 1]]";
+    ASSERT_EQ(ss.str(), repr);
+
+    *m += 1;
+
+    ss.str(string());
+
+    ss << *m;
+    repr = "[[2, 1], [1, 2]]";
+    ASSERT_EQ(ss.str(), repr);
+}
+
 TEST(MatrixBasicTesting, MatrixBasicScalarOperations)
 {
     IMatrix<int>::type* m =  new NaiveMatrix<int>(2,2);
@@ -44,9 +66,30 @@ TEST(MatrixBasicTesting, MatrixBasicScalarOperations)
 
     *m *= 2;
 
-    stringstream ss2;
-    ss2 << *m;
+    ss.str(string());
+    ss << *m;
     repr = "[[4, 2], [2, 4]]";
+    ASSERT_EQ(ss.str(), repr);
+}
+
+TEST(MatrixBasicTesting, MatrixBasicMatrixAddition) {
+    IMatrix<int>::type *m = new NaiveMatrix<int>(2, 2);
+    m->SetItemAt(0, 0, 1);
+    m->SetItemAt(0, 1, 0);
+    m->SetItemAt(1, 0, 0);
+    m->SetItemAt(1, 1, 1);
+
+    IMatrix<int>::type *m2 = new NaiveMatrix<int>(2, 2);
+    m2->SetItemAt(0, 0, 0);
+    m2->SetItemAt(0, 1, 1);
+    m2->SetItemAt(1, 0, 1);
+    m2->SetItemAt(1, 1, 0);
+
+    *m += *m2;
+
+    stringstream ss;
+    ss << *m;
+    string repr = "[[1, 1], [1, 1]]";
     ASSERT_EQ(ss.str(), repr);
 }
 
@@ -59,16 +102,16 @@ TEST(MatrixBasicTesting, MatrixBasicMatrixOperations)
     m->SetItemAt(1, 1, 1);
 
     IMatrix<int>::type* m2 =  new NaiveMatrix<int>(2,2);
-    m->SetItemAt(0, 0 ,0);
-    m->SetItemAt(0, 1, 1);
-    m->SetItemAt(1, 0, 1);
-    m->SetItemAt(1, 1, 0);
+    m2->SetItemAt(0, 0 ,0);
+    m2->SetItemAt(0, 1, 1);
+    m2->SetItemAt(1, 0, 1);
+    m2->SetItemAt(1, 1, 0);
 
     *m += *m2;
 
     stringstream ss;
     ss << *m;
-    string repr = "[[2, 2], [2, 2]]";
+    string repr = "[[1, 1], [1, 1]]";
     ASSERT_EQ(ss.str(), repr);
 
     *m += NaiveMatrix<int>((*m2)*-1);
@@ -92,9 +135,9 @@ TEST(MatrixBasicTesting, MatrixTranspose)
     ASSERT_EQ(ss.str(), repr);
 
     m = &m->Transpose();
-    stringstream ss2;
-    ss2 << *m;
-    repr= "[[1, 0], [0, 1], [1, 0]]";
+    ss.str(string());
+    ss << *m;
+    repr= "[[1, 0], [1, 0], [1, 0]]";
     ASSERT_EQ(ss.str(), repr);
 }
 
